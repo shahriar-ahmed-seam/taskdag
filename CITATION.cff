@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you utilize TaskDAG in academic research or production agent systems, cite it as below."
+title: "TaskDAG: Per-Task Dynamic DAG Engine with Lossless Context Compaction and Runtime Replanning"
+version: 0.1.0
+date-released: 2026-10-10
+url: "https://github.com/shahriar-ahmed-seam/taskdag"
+authors:
+  - family-names: "Seam"
+    given-names: "Shahriar Ahmed"
+license: Apache-2.0
+keywords:
+  - multi-agent systems
+  - task decomposition
+  - dynamic replanning
+  - context compaction
+  - coordination tax
