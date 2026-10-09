@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "taskdag"
+version = "0.1.0"
+description = "Per-Task Dynamic DAG Engine with Lossless Context Compaction and Runtime Replanning"
+readme = "README.md"
+authors = [
+    { name = "Shahriar Ahmed Seam", email = "shahriarahmedseam@users.noreply.github.com" }
+]
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+keywords = [
+    "multi-agent",
+    "dag",
+    "dynamic-replanning",
+    "context-compaction",
+    "agentic-ai",
+    "task-decomposition",
+    "workflow-orchestration",
+    "structural-prior",
+    "coordination-tax"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+dependencies = [
+    "pydantic>=2.7.0",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+    "typer>=0.12.0",
+    "rich>=13.7.0",
+    "httpx>=0.27.0",
+    "pyyaml>=6.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.4.0",
+]
+
+[project.scripts]
+taskdag = "taskdag.cli.main:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
