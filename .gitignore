@@ -22,3 +22,5 @@ runs/
 # Agent configuration & meta folders
 .agents/
 .github/
+
+ENGINEERING_PLAYBOOK_PROMPT.md
