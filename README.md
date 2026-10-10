@@ -10,21 +10,11 @@ TaskDAG provides an enterprise-grade orchestration and execution engine designed
 
 Industry multi-agent frameworks (e.g., AutoGen, CrewAI, ChatDev, MetaGPT) assign static personas (such as "Product Manager", "Software Engineer", "Code Reviewer") in hard-coded sequential pipelines. While appealing conceptually, this structure breaks down on unseen tasks due to three systemic failure mechanisms:
 
-```
-+-------------------------------------------------------------+
-|              Hard-coded Task Shape Assumption               |
-+-------------------------------------------------------------+
-          |                         |                        |
-          v                         v                        v
-+--------------------+    +--------------------+    +--------------------+
-|  Structural Prior  |    |   Lossy Context    |    |    Unnecessary     |
-|      Mismatch      |    |      Handoffs      |    |  Coordination Tax  |
-+--------------------+    +--------------------+    +--------------------+
-| Frozen pipeline    |    | Role boundaries    |    | Paying multi-agent |
-| assumes spec-code- |    | drop critical      |    | overhead when      |
-| test; cannot adapt |    | facts, diffs, and  |    | subtasks are not   |
-| or replan.         |    | error traces.      |    | truly separable.   |
-+--------------------+    +--------------------+    +--------------------+
+```mermaid
+flowchart TD
+    ROOT["Hard-coded Task Shape Assumption"] --> M1["Structural Prior Mismatch<br/>Frozen pipeline assumes spec-implement-test; cannot adapt or replan"]
+    ROOT --> M2["Lossy Context Handoffs<br/>Role boundaries drop details; downstream agents lose critical facts"]
+    ROOT --> M3["Unnecessary Coordination Tax<br/>Paying multi-agent overhead when subtasks are not separable"]
 ```
 
 ### The Three Operational Invariants
@@ -55,53 +45,20 @@ In empirical evaluations reproducing the Carnegie Mellon University study on mul
 
 ## 3. Architecture Blueprint
 
-```
-+--------------------------------------------------------------------------+
-|                              TaskDAG Engine                              |
-+--------------------------------------------------------------------------+
-|                                                                          |
-|  [Input Task Objective]                                                  |
-|           |                                                              |
-|           v                                                              |
-|  +--------------------------------------------------------------------+  |
-|  | Subtask Separability Analyzer                                      |  |
-|  | S(T) = 1 - (alpha * OverlapRatio + (1 - alpha) * Coupling)          |  |
-|  +--------------------------------------------------------------------+  |
-|       |                                               |                  |
-|       | S(T) < threshold                              | S(T) >= threshold|
-|       v                                               v                  |
-|  +--------------------------+               +-----------------------+    |
-|  | Single-Agent Monolith    |               | Concurrent TaskDAG    |    |
-|  | (Zero Coordination Tax)  |               | (Topological Waves)   |    |
-|  +--------------------------+               +-----------------------+    |
-|       |                                               |                  |
-|       +-----------------------+-----------------------+                  |
-|                               |                                          |
-|                               v                                          |
-|  +--------------------------------------------------------------------+  |
-|  | Async DAG Scheduler & Execution Pipeline                           |  |
-|  | - Concurrency Control (Semaphore)                                 |  |
-|  | - Topological Wave Dispatch                                        |  |
-|  +--------------------------------------------------------------------+  |
-|       |                                   ^                              |
-|       | Runtime Deviation / Exception     | Dynamic DAG Mutation         |
-|       v                                   |                              |
-|  +--------------------------------------------------------------------+  |
-|  | Dynamic Runtime Replanner                                          |  |
-|  | - Failure Diagnosis                                                |  |
-|  | - INJECT_REMEDIATION / SPLIT_NODE / PRUNE_SUBTREE / DEGRADE         |  |
-|  | - Invariant & Cycle Verification                                  |  |
-|  +--------------------------------------------------------------------+  |
-|       |                                                                  |
-|       v                                                                  |
-|  +--------------------------------------------------------------------+  |
-|  | Lossless Context Compactor                                         |  |
-|  | - FactRegistry (Ground-truth verified values)                      |  |
-|  | - ArtifactDeltaStore (SHA-256, AST diffs)                          |  |
-|  | - ExecutionTraceTail (Structured exit codes & error snippets)      |  |
-|  +--------------------------------------------------------------------+  |
-|                                                                          |
-+--------------------------------------------------------------------------+
+```mermaid
+flowchart TD
+    START(["Input Task Objective"]) --> SEP["Subtask Separability Analyzer<br/>S(T) = 1 - (alpha * Overlap + (1 - alpha) * Coupling)"]
+
+    SEP -->|"S(T) < threshold"| MONO["Single-Agent Monolith<br/>Zero Coordination Tax"]
+    SEP -->|"S(T) >= threshold"| CONC["Concurrent TaskDAG<br/>Topological Wave Execution"]
+
+    MONO --> SCHED["Async DAG Scheduler & Execution Pipeline<br/>Concurrency Control & Wave Dispatch"]
+    CONC --> SCHED
+
+    SCHED -->|"Runtime Exception / Deviation"| REPLAN["Dynamic Runtime Replanner<br/>Remediation Injection / Node Splitting / Degradation"]
+    REPLAN -->|"Acyclic Mutation & Rewiring"| SCHED
+
+    SCHED -->|"State & Artifacts"| COMPACT["Lossless Context Compactor<br/>Fact Registry &bull; SHA-256 Diffs &bull; Telemetry Tail"]
 ```
 
 ---
